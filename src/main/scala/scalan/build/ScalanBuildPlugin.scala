@@ -7,11 +7,21 @@ object ScalanBuildPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
-  lazy val baseScalanBuildSettings: Seq[Def.Setting[_]] = Seq(
+  private def utilitySettings = Seq(
     commands ++= Seq(versionSnapshot)
   )
 
-  override lazy val projectSettings = baseScalanBuildSettings
+  private def scalaSettings = Seq(
+    scalacOptions ++= Seq(
+      "-encoding", "UTF-8",
+      "-feature",
+      "-unchecked",
+      "-deprecation",
+      "-Xlint",
+      "-Yinline")
+  )
+
+  override lazy val projectSettings = scalaSettings ++ utilitySettings
 }
 
 object ScalanBuild {
