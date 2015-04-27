@@ -21,8 +21,7 @@ object ScalanBuildPlugin extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-      "-Xlint",
-      "-Yinline")
+      "-Xlint")
   )
 
   override lazy val projectSettings = scalaSettings ++ scalanSettings
