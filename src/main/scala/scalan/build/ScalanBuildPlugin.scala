@@ -21,7 +21,8 @@ object ScalanBuildPlugin extends AutoPlugin {
       "-feature",
       "-unchecked",
       "-deprecation",
-      "-Xlint")
+      "-Xlint"),
+    autoAPIMappings := true
   )
 
   override lazy val projectSettings = scalaSettings ++ scalanSettings
@@ -32,12 +33,12 @@ object ScalanBuild {
   def snapshotRevision = Command.command("snapshotRevision") { state =>
     val extracted = Project extract state
     val aggregates = aggregate(state, withCurrent = true)
-    val newVersion = mkSnapshotVersion(state, gitRev)
+    val snapshotVersion = mkSnapshotVersion(state, gitRev)
 
-    state.log.info(s"Set version to $newVersion")
+    state.log.info(s"Set version to $snapshotVersion")
 
     val settings = (Seq.empty[Def.Setting[String]] /: aggregates) { (s, ref) =>
-      s :+ (version in ref := newVersion)
+      s :+ (version in ref := snapshotVersion)
     }
 
     extracted.append(settings, state)
@@ -59,5 +60,4 @@ object ScalanBuild {
     if (get(isSnapshot)) s"$version-$rev"
     else version
   }
-
 }
