@@ -12,4 +12,4 @@ scalacOptions := Seq(
   "-encoding", "UTF-8",
   "-feature", "-deprecation", "-unchecked")
 
-publishMavenStyle := false
+publishMavenStyle := true
