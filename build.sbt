@@ -4,7 +4,7 @@ name := "scalan-build"
 
 organization := "com.huawei.scalan"
 
-version := "0.1.3"
+version := "0.1.4-SNAPSHOT"
 
 licenses := Seq("Apache 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"))
 
