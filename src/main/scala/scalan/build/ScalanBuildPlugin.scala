@@ -47,7 +47,7 @@ object ScalanBuild {
   }
 
   def gitRev: Option[String] = {
-    util.Try(s"git rev-parse --short=$RevLength HEAD".!!).toOption
+    util.Try(s"git rev-parse --short=$RevLength HEAD".lines_!.head).toOption
   }
 
   def envRev: Option[String] = {
