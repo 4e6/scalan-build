@@ -33,7 +33,7 @@ object ScalanBuild {
   def snapshotRevision = Command.command("snapshotRevision") { state =>
     val extracted = Project extract state
     val aggregates = aggregate(state, withCurrent = true)
-    val snapshotVersion = mkSnapshotVersion(state, gitRev)
+    val snapshotVersion = mkSnapshotVersion(state, buildRev)
 
     state.log.info(s"Set version to $snapshotVersion")
 
@@ -46,6 +46,10 @@ object ScalanBuild {
 
   def gitRev: String = {
     "git rev-parse --short HEAD".lines_!.head
+  }
+
+  def buildRev: String = {
+    sys.env.getOrElse("VCS_REVISION", gitRev).take(7)
   }
 
   def aggregate(state: State, withCurrent: Boolean): Seq[ProjectRef] = {
