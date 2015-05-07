@@ -11,7 +11,7 @@ object ScalanBuildPlugin extends AutoPlugin {
   import autoImport._
 
   private def scalanSettings = Seq(
-    gitRevision := ScalanBuild.gitRev,
+    gitRevision := ScalanBuild.gitRev.get,
     commands ++= Seq(snapshotRevision)
   )
 
@@ -30,10 +30,12 @@ object ScalanBuildPlugin extends AutoPlugin {
 
 object ScalanBuild {
 
+  val RevLength = 7
+
   def snapshotRevision = Command.command("snapshotRevision") { state =>
     val extracted = Project extract state
     val aggregates = aggregate(state, withCurrent = true)
-    val snapshotVersion = mkSnapshotVersion(state, buildRev)
+    val snapshotVersion = mkSnapshotVersion(state, envRev orElse gitRev)
 
     state.log.info(s"Set version to $snapshotVersion")
 
@@ -44,12 +46,12 @@ object ScalanBuild {
     extracted.append(settings, state)
   }
 
-  def gitRev: String = {
-    "git rev-parse --short HEAD".lines_!.head
+  def gitRev: Option[String] = {
+    util.Try(s"git rev-parse --short=$RevLength HEAD".!!).toOption
   }
 
-  def buildRev: String = {
-    sys.env.getOrElse("VCS_REVISION", gitRev).take(7)
+  def envRev: Option[String] = {
+    sys.env.get("VCS_REVISION").map(_ take RevLength)
   }
 
   def aggregate(state: State, withCurrent: Boolean): Seq[ProjectRef] = {
@@ -58,10 +60,9 @@ object ScalanBuild {
     if (withCurrent) currentRef +: aggs else aggs
   }
 
-  private def mkSnapshotVersion(state: State, rev: String): String = {
+  private def mkSnapshotVersion(state: State, revision: Option[String]): String = {
     val x = Project.extract(state); import x._
     val version = get(Keys.version)
-    if (get(isSnapshot)) s"$version-$rev"
-    else version
+    revision.fold(version)(rev => if (get(isSnapshot)) s"$version-$rev" else version)
   }
 }
